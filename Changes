@@ -1,8 +1,13 @@
 Revision history for Perl extension Package::Alias
 
+0.04 Sun Jul 20 21:59:31 PDT 2003
+	- Removed eval
+
 0.03 Thu Jul 17 10:30:54 2003
 	- API change: argument order is reversed to behave like
 	  use constant, and ln(1) syntax.
+	- Added $BRAVE. P::A won't blow away an existing namespace
+	  unless you explicitly tell it to.
 
 0.02 Mon Jan  7 12:49:13 2003
 	- No code changes

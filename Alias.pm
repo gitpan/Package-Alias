@@ -9,7 +9,7 @@ use strict qw/vars subs/;
 use vars   qw/$VERSION $DEBUG $BRAVE/;
 use Carp;
 
-$VERSION     = '0.03';
+$VERSION     = '0.04';
 $DEBUG       = 0;
 
 #------------------------------------------------------------
@@ -20,29 +20,17 @@ sub alias {
     my $class_or_self = shift;
     my %args  = @_;
 
-    $DB::single++;
-
     while ( my ( $alias, $orig ) = each %args ) {
 
-	# Ensure trailing "::" is present.
-        $alias .= '::' unless  $alias =~ /::$/;
-        $orig  .= '::' unless  $orig  =~ /::$/;
-
-	if ( scalar keys %{$alias} && ! $BRAVE ) {
+	if ( scalar keys %{$alias . "::" } && ! $BRAVE ) {
 	    carp "Cowardly refusing to alias over '$alias' because it's already in use";
 	    next;
 	}
 
-	# Insert a '\' before each "::".
-	$alias =~ s/ (?<! \\ ) :: /\\::/gx;
-	$orig  =~ s/ (?<! \\ ) :: /\\::/gx;
+	*{$alias . "::"} = \*{$orig . "::"};
 
-	my $eval = qq(*{"$alias"} = \\*{"$orig"});
-
-	print STDERR __PACKAGE__ . ": aliasing '$alias' => '$orig' with $eval\n"
+	print STDERR __PACKAGE__ . ": aliasing '$alias' => '$orig'\n"
 	    if $DEBUG;
-
-	eval $eval;
     }
 }
 
