@@ -1,4 +1,7 @@
 # -*- perl -*-
+#
+# Tests basic usage with single-level namespaces (no ::s in them)
+#
 
 use Test::More tests => 9;
 #use Test::More qw/no_plan/;
@@ -10,10 +13,10 @@ package M;     $var = "M";
 
 package main;
 
-use Package::Alias A => B;
-use Package::Alias C => D;
-use Package::Alias K => L,
-		   M => N;
+use Package::Alias B => A;
+use Package::Alias D => C;
+use Package::Alias L => K,
+		   N => M;
 
 # Originals
 is $A::var,	"A",		"Original: A";

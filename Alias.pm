@@ -2,13 +2,14 @@
 #
 # Package::Alias - Alias one namespace into another
 #
-# $Id: Alias.pm,v 1.5 2003/07/16 19:50:12 jkeroes Exp $
+# $Id: Alias.pm,v 1.9 2003/07/17 20:17:16 jkeroes Exp $
 
 package Package::Alias;
 use strict qw/vars subs/;
-use vars   qw/$VERSION $DEBUG/;
+use vars   qw/$VERSION $DEBUG $BRAVE/;
+use Carp;
 
-$VERSION     = '0.02';
+$VERSION     = '0.03';
 $DEBUG       = 0;
 
 #------------------------------------------------------------
@@ -19,19 +20,26 @@ sub alias {
     my $class_or_self = shift;
     my %args  = @_;
 
-    while ( my ( $old, $new ) = each %args ) {
+    $DB::single++;
+
+    while ( my ( $alias, $orig ) = each %args ) {
 
 	# Ensure trailing "::" is present.
-        $old .= '::' unless  $old =~ /::$/;
-        $new .= '::' unless  $new =~ /::$/;
+        $alias .= '::' unless  $alias =~ /::$/;
+        $orig  .= '::' unless  $orig  =~ /::$/;
+
+	if ( scalar keys %{$alias} && ! $BRAVE ) {
+	    carp "Cowardly refusing to alias over '$alias' because it's already in use";
+	    next;
+	}
 
 	# Insert a '\' before each "::".
-	$old =~ s/ (?<! \\ ) :: /\\::/gx;
-	$new =~ s/ (?<! \\ ) :: /\\::/gx;
+	$alias =~ s/ (?<! \\ ) :: /\\::/gx;
+	$orig  =~ s/ (?<! \\ ) :: /\\::/gx;
 
-	my $eval = qq(*{"$new"} = \\*{"$old"});
+	my $eval = qq(*{"$alias"} = \\*{"$orig"});
 
-	print STDERR __PACKAGE__ . ": aliasing '$old' => '$new' with $eval\n"
+	print STDERR __PACKAGE__ . ": aliasing '$alias' => '$orig' with $eval\n"
 	    if $DEBUG;
 
 	eval $eval;
@@ -44,9 +52,9 @@ sub alias {
 
 __END__
 
-#------------------------------
+#------------------------------------------------------------
 # Docs
-#------------------------------
+#------------------------------------------------------------
 
 =head1 NAME
 
@@ -54,29 +62,43 @@ Package::Alias - alias one namespace into another
 
 =head1 SYNOPSIS
 
-  use Package::Alias
-      main => 'Foo::Bar',
-      Package::Name::Simply::Too::Long::To::Use => 'Pkg';
+  use Package::Alias Foo    => 'main',
+		     P      => 'Really::Long::Package::Name',
+                     'A::B' => 'C::D',
+		     Alias  => 'Existing::Namespace';
 
 =head1 DESCRIPTION
 
 This module aliases one package name to another. After running the
-SYNOPSIS code, @INC and @Foo::Bar::INC reference the same memory.
-$Package::Name::Simply::Too::Long::To::Use::var and $Pkg::var do
-as well.
+SYNOPSIS code,  C<@INC> and C<@Foo::INC> reference the same memory.
+C<$Really::Long::Package::Name::var> and $P::var do as well.
+
+To be strict-compliant, you'll need to quote any packages on the
+left-hand side of a => if the namespace has colons. Packages on the
+right-hand side all have to be quoted. This is documented as
+L<perlop/"Comma Operator">.
 
 Chip Salzenberg says that it's not technically feasible to perform
 runtime namespace aliasing.  At compile time, Perl grabs pointers to
 functions and global vars.  Those pointers aren't updated if we alias
-the namespace at runtime. 
+the namespace at runtime.
+
+=head1 GLOBALS
+
+Package::Alias won't, by default, alias over a namespace if it's
+already in use. That's not considered a fatal error - you'll just get
+a warning and flow will continue. You can change that cowardly
+behaviour this way:
+
+  # Make Bar like Foo, even if Bar is already in use.
+
+  BEGIN { $Package::Alias::BRAVE = 1 }
+
+  use Package::Alias Bar => 'Foo';
 
 =head1 AUTHOR
 
 Joshua Keroes <skunkworks@eli.net>
-
-=head1 BUGS
-
-alias() should return success or failure but I don't know what to check. Help?
 
 =head1 SEE ALSO
 

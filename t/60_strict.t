@@ -1,18 +1,18 @@
 # -*- perl -*-
 #
-# Tests basic usage with multi-level namespaces (they have ::s in them)
+# Tests behavior under strict.
 #
 
-use Test::More tests => 5;
-#use Test::More qw/no_plan/;
+#use Test::More tests => 5;
+use Test::More qw/no_plan/;
 
-package A::B;  $var = "A::B";
-package D;     $var = "D";
+use strict;
 
-package main;
+$A::B::var = "A::B";
+$D::var    = "D";
 
-use Package::Alias C    => A::B,
-		   E::F => D;
+use Package::Alias C    => 'A::B',
+		   'E::F' => 'D';
 
 # Originals
 is $A::B::var,	"A::B",		"Original: A::B";

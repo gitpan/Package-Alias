@@ -1,5 +1,9 @@
 Revision history for Perl extension Package::Alias
 
+0.03 Thu Jul 17 10:30:54 2003
+	- API change: argument order is reversed to behave like
+	  use constant, and ln(1) syntax.
+
 0.02 Mon Jan  7 12:49:13 2003
 	- No code changes
 	- Changed documentation per Chip's request.

@@ -10,3 +10,6 @@ t/01_ini.t
 t/10_begin.t
 t/20_level.t
 t/30_lexical.t
+t/40_coward.t
+t/50_brave.t
+t/60_strict.t

@@ -1,15 +1,19 @@
 # -*- perl -*-
 #
-# Tests basic usage with multi-level namespaces (they have ::s in them)
+# Tests whether Package::Alias will blow away an existing namespace.
 #
+
 
 use Test::More tests => 5;
 #use Test::More qw/no_plan/;
 
 package A::B;  $var = "A::B";
+package C;     $var = "C";
 package D;     $var = "D";
 
 package main;
+
+BEGIN { $Package::Alias::BRAVE = 1 }
 
 use Package::Alias C    => A::B,
 		   E::F => D;
@@ -19,7 +23,7 @@ is $A::B::var,	"A::B",		"Original: A::B";
 is $D::var,	"D",		"Original: D";
 
 # Aliases
-is $C::var,	"A::B",		"Alias: C";
+is $C::var,	"A::B",		"Package C not retained";
 is $E::F::var,	"D",		"Alias: E::F";
 
 ok    $A::B::var

@@ -1,11 +1,13 @@
 # -*- perl -*-
+#
+# Tests whether lexical values are available in aliased classes
+#
 
 use Test::More tests => 4;
 #use Test::More qw/no_plan/;
 
-use Package::Alias
-    'A::B' => 'C',
-    'D'    => 'E::F';
+use Package::Alias C    => A::B,
+		   E::F => D;
 
 package A::B; use Test::More; my $ab = "A::B";
 package C;    use Test::More;
