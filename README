@@ -1,5 +1,30 @@
-pod2text lib/Package/Alias.pm > README
+NAME
+    Package::Alias - alias one namespace into another
 
-If this is still here it means the programmer was too lazy to create the readme file.
+SYNOPSIS
+      use Package::Alias
+        main => 'Foo::Bar',
+        Package::Name::Simply::Too::Long::To::Use => 'Pkg';
 
-You can create it now by using the command shown above from this directory.
+DESCRIPTION
+    This module aliases one package name to another. After running the
+    SYNOPSIS code, @INC and @Foo::Bar::INC reference the same memory.
+    $Package::Name::Simply::Too::Long::To::Use::var and $Pkg::var do as
+    well.
+
+    Chip Salzenberg says that it's not technically feasible to perform
+    runtime namespace aliasing. At compile time, Perl grabs pointers to
+    functions and global vars. Those pointers aren't updated if we alias the
+    namespace at runtime. It may be possible to do this with some work with
+    XS.
+
+AUTHOR
+    Joshua Keroes <skunkworks@eli.net>
+
+BUGS
+    alias() should return success or failure but I don't know what to check.
+    Help?
+
+SEE ALSO
+    Devel::Symdump
+
