@@ -1,0 +1,12 @@
+.cvsignore
+Alias.pm
+Changes
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+t/01_ini.t
+t/10_begin.t
+t/20_level.t
+t/30_lexical.t
