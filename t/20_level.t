@@ -6,23 +6,25 @@
 use Test::More tests => 5;
 #use Test::More qw/no_plan/;
 
-package A::B;  $var = "A::B";
-package D;     $var = "D";
+package Janiva::Magness; $var = "Janiva::Magness";
+package DrMichaelWhite; $var = "DrMichaelWhite";
 
 package main;
+use lib 't/lib';
 
-use Package::Alias C    => A::B,
-		   E::F => D;
+use Package::Alias 
+    'CharlesBrown' => 'Janiva::Magness',
+    'EttaJames::FreddieKing' => 'DrMichaelWhite';
 
 # Originals
-is $A::B::var,	"A::B",		"Original: A::B";
-is $D::var,	"D",		"Original: D";
+is $Janiva::Magness::var,	"Janiva::Magness", "Original: Janiva::Magness";
+is $DrMichaelWhite::var, "DrMichaelWhite", "Original: DrMichaelWhite";
 
 # Aliases
-is $C::var,	"A::B",		"Alias: C";
-is $E::F::var,	"D",		"Alias: E::F";
+is $CharlesBrown::var, "Janiva::Magness", "Alias: CharlesBrown";
+is $EttaJames::FreddieKing::var, "DrMichaelWhite", "Alias: EttaJames::FreddieKing";
 
-ok    $A::B::var
-    & $C::var
-    & $D::var
-    & $E::F::var,		"Silence warnings by using variables once";
+ok $Janiva::Magness::var
+ . $CharlesBrown::var
+ . $DrMichaelWhite::var
+ . $EttaJames::FreddieKing::var, "Silence warnings by using variables once";

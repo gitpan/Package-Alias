@@ -5,25 +5,26 @@
 
 use Test::More tests => 4;
 #use Test::More qw/no_plan/;
+use lib 't/lib';
 
-use Package::Alias C    => A::B,
-		   E::F => D;
+use Package::Alias 
+    'CharlesBrown' => 'Janiva::Magness',
+    'Sharon::Jones' => 'DrMichaelWhite';
 
-package A::B; use Test::More; my $ab = "A::B";
-package C;    use Test::More;
-package D;    use Test::More; my $d = "D";
-package E::F; use Test::More;
-
+package Janiva::Magness; use Test::More; my $ab = "Janiva::Magness";
+package CharlesBrown; use Test::More;
+package DrMichaelWhite; use Test::More; my $d = "DrMichaelWhite";
+package Sharon::Jones; use Test::More;
 
 # Originals
-package A::B;
-is $ab,	"A::B",		"Original: A::B";
+package Janiva::Magness;
+is $ab, "Janiva::Magness", "Original: Janiva::Magness";
 
-package D;
-is $d,	"D",		"Original: D";
+package DrMichaelWhite;
+is $d, "DrMichaelWhite", "Original: DrMichaelWhite";
 
-package C;
-is $ab,	"A::B",		"Alias: C";
+package CharlesBrown;
+is $ab, "Janiva::Magness", "Alias: CharlesBrown";
 
-package E::F;
-is $d,	"D",		"Alias: E::F";
+package Sharon::Jones;
+is $d, "DrMichaelWhite", "Alias: Sharon::Jones";

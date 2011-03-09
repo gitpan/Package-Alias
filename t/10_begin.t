@@ -5,38 +5,39 @@
 
 use Test::More tests => 9;
 #use Test::More qw/no_plan/;
+use lib 't/lib';
 
-package A;     $var = "A";
-package C;     $var = "C";
-package K;     $var = "K";
-package M;     $var = "M";
+package AlGreen; $var = "AlGreen";
+package CharlesBrown; $var = "CharlesBrown";
+package KaraGrainger; $var = "KaraGrainger";
+package Maceo; $var = "Maceo";
 
 package main;
 
-use Package::Alias B => A;
-use Package::Alias D => C;
-use Package::Alias L => K,
-		   N => M;
+use Package::Alias BrotherYusef => AlGreen;
+use Package::Alias DrMichaelWhite => CharlesBrown;
+use Package::Alias Lhasa => KaraGrainger,
+    NinaSimone => Maceo;
 
 # Originals
-is $A::var,	"A",		"Original: A";
-is $C::var,	"C",		"Original: C";
-is $K::var,	"K",		"Original: K";
-is $M::var,	"M",		"Original: M";
+is $AlGreen::var, "AlGreen", "Original: AlGreen";
+is $CharlesBrown::var, "CharlesBrown", "Original: CharlesBrown";
+is $KaraGrainger::var, "KaraGrainger", "Original: KaraGrainger";
+is $Maceo::var, "Maceo", "Original: Maceo";
 
 # Aliases
-is $B::var,	"A",		"Alias: B";
-is $D::var,	"C",		"Alias: D";
+is $BrotherYusef::var, "AlGreen", "Alias: BrotherYusef";
+is $DrMichaelWhite::var, "CharlesBrown", "Alias: DrMichaelWhite";
 
 # More than one package aliased in one call
-is $L::var,	"K",		"Alias: L";
-is $N::var,	"M",		"Alias: N";
+is $Lhasa::var, "KaraGrainger", "Alias: Lhasa";
+is $NinaSimone::var, "Maceo", "Alias: NinaSimone";
 
-ok    $A::var
-    & $B::var
-    & $C::var
-    & $D::var
-    & $K::var
-    & $L::var
-    & $M::var
-    & $N::var,			"Silence warnings by using variables once";
+ok $AlGreen::var
+ . $BrotherYusef::var
+ . $CharlesBrown::var
+ . $DrMichaelWhite::var
+ . $KaraGrainger::var
+ . $Lhasa::var
+ . $Maceo::var
+ . $NinaSimone::var, "Silence warnings by using each variables once";

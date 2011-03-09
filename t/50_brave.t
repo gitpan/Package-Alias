@@ -3,30 +3,27 @@
 # Tests whether Package::Alias will blow away an existing namespace.
 #
 
+#use Test::More tests => 7;
+use Test::More qw/no_plan/;
+use lib 't/lib';
 
-use Test::More tests => 5;
-#use Test::More qw/no_plan/;
-
-package A::B;  $var = "A::B";
-package C;     $var = "C";
-package D;     $var = "D";
+package Janiva::Magness; $var = "Janiva::Magness";
+package CharlesBrown;    $var = "CharlesBrown";
 
 package main;
 
-BEGIN { $Package::Alias::BRAVE = 1 }
-
-use Package::Alias C    => A::B,
-		   E::F => D;
-
 # Originals
-is $A::B::var,	"A::B",		"Original: A::B";
-is $D::var,	"D",		"Original: D";
+is $CharlesBrown::var, "CharlesBrown", "Original: CharlesBrown";
+is $Janiva::Magness::var, "Janiva::Magness", "Original: Janiva::Magness";
+
+BEGIN { $Package::Alias::BRAVE = 1 }
+is $Package::Alias::BRAVE, 1, "brave mode is on";
+
+use Package::Alias 'CharlesBrown' => 'Janiva::Magness';
 
 # Aliases
-is $C::var,	"A::B",		"Package C not retained";
-is $E::F::var,	"D",		"Alias: E::F";
+is $CharlesBrown::var, "Janiva::Magness", "Package CharlesBrown successfully clobbered";
+is $Janiva::Magness::var, "Janiva::Magness", "Package Janiva::Magness not changed";
 
-ok    $A::B::var
-    & $C::var
-    & $D::var
-    & $E::F::var,		"Silence warnings by using variables once";
+ok $Janiva::Magness::var
+ . $CharlesBrown::var, "Silence warnings by using variables once";
