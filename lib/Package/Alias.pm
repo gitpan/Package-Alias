@@ -1,11 +1,13 @@
 package Package::Alias;
+{
+  $Package::Alias::VERSION = '0.13';
+}
 # ABSTRACT: Alias one namespace as another
 
 use strict qw/vars subs/;
 use Carp;
 use 5.006; # for INIT
 
-our $VERSION = '0.12';
 our $BRAVE;
 our $DEBUG;
 
@@ -14,15 +16,14 @@ sub alias {
     my %args  = @_;
 
     while (my ($alias, $orig) = each %args) {
+        if (scalar keys %{$alias . "::" } && ! $BRAVE) {
+            carp "Cowardly refusing to alias over '$alias' because it's already in use";
+            next;
+        }
 
-	if (scalar keys %{$alias . "::" } && ! $BRAVE) {
-	    carp "Cowardly refusing to alias over '$alias' because it's already in use";
-	    next;
-	}
-
-	*{$alias . "::"} = \*{$orig . "::"};
-	print STDERR __PACKAGE__ . ": '$alias' is now an alias for '$orig'\n"
-	    if $DEBUG;
+        *{$alias . "::"} = \*{$orig . "::"};
+        print STDERR __PACKAGE__ . ": '$alias' is now an alias for '$orig'\n"
+            if $DEBUG;
     }
 }
 
@@ -49,7 +50,7 @@ sub import {
 
 1;
 
-
+__END__
 
 =pod
 
@@ -59,7 +60,7 @@ Package::Alias - Alias one namespace as another
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -67,25 +68,6 @@ version 0.12
       Foo    => 'main',
       'P::Q' => 'Really::Long::Package::Name',
       Alias  => 'Existing::Namespace';
-      
-  BEGIN {
-    use Package::Alias Moose => Mouse;
-
-    # Make Mouse's finicky internal checks happy...
-    Moose::Exporter->setup_import_methods(exporting_package => 'Moose',
-
-        # Alas the defaults live in Mouse...
-        as_is => [qw(
-                extends with
-                has
-                before after around
-                override super
-                augment  inner
-            ),
-            \&Scalar::Util::blessed,
-            \&Carp::confess,
-        ],
-    );
 
 =head1 DESCRIPTION
 
@@ -100,15 +82,7 @@ Modules not currently loaded into %INC will be used automatically. e.g.,
 To facilitate some crafty slight of hand, the above will also
 C<use P::Q> if it's not already loaded, and tell Perl that
 C<Really::Long::Package::Name> is loaded. In some rare cases
-such as C<Mouse>, additional trickery may be required...
-
-=head1 NAME
-
-Package::Alias - alias one namespace as another
-
-=head1 VERSION
-
-version 0.12
+such as C<Mouse>, additional trickery may be required; see L<"Working with Mouse">.
 
 =head1 GLOBALS
 
@@ -144,20 +118,26 @@ runtime namespace aliasing.  At compile time, Perl grabs pointers to
 functions and global vars.  Those pointers aren't updated if we alias
 the namespace at runtime.
 
-=head1 LICENSE AND COPYRIGHT
+=head2 Working with Mouse
 
-Copyright 2003-2011 Joshua Keroes.
+  BEGIN {
+    use Package::Alias Moose => Mouse;
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+    # Make Mouse's finicky internal checks happy...
+    Moose::Exporter->setup_import_methods(exporting_package => 'Moose',
 
-See http://dev.perl.org/licenses/ for more information.
-
-=head1 AUTHORS
-
-Joshua Keroes <joshua@cpan.org>
-Jerrad Pierce <jpierce@cpan.org>
+        # Alas the defaults live in Mouse...
+        as_is => [qw(
+                extends with
+                has
+                before after around
+                override super
+                augment  inner
+            ),
+            \&Scalar::Util::blessed,
+            \&Carp::confess,
+        ],
+    );
 
 =head1 SEE ALSO
 
@@ -165,21 +145,25 @@ L<aliased>
 L<namespace>
 L<Devel::Symdump>
 
-=cut
+=head1 AUTHORS
 
-=head1 AUTHOR
+=over 4
+
+=item *
 
 Joshua Keroes <joshua@cpan.org>
 
+=item *
+
+Jerrad Pierce <jpierce@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Joshua Keroes.
+This software is copyright (c) 2013 by Joshua Keroes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
